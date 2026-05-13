@@ -114,7 +114,9 @@ jobs:
           node --check mcp-servers/pub-dev-mcp/lib/pubdev-client.js && echo "OK: pubdev-client.js"
 
       - name: Validate pub-dev-mcp package.json
-        run: python3 -m json.tool mcp-servers/pub-dev-mcp/package.json > /dev/null && echo "OK: pub-dev-mcp/package.json"
+        run: |
+          python3 -m json.tool mcp-servers/pub-dev-mcp/package.json > /dev/null
+          echo "OK: pub-dev-mcp/package.json"
 
       - name: Hook smoke test — secret_detect blocks high-confidence secrets
         run: |
