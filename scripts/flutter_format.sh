@@ -123,7 +123,6 @@ else
 
   # Parse how many files were changed
   CHANGED=$(echo "$FORMAT_OUTPUT" | grep -oE "Formatted [0-9]+ file" | grep -oE "[0-9]+" | head -1 || true)
-  UNCHANGED=$(echo "$FORMAT_OUTPUT" | grep -oE "unchanged" | head -1 || true)
 
   echo "------------------------------------------"
   if [[ -n "$CHANGED" && "$CHANGED" -gt 0 ]]; then
