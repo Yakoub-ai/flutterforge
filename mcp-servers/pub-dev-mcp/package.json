@@ -1,0 +1,19 @@
+{
+  "name": "pub-dev-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for querying pub.dev: search packages, fetch metadata, check scores, and validate Flutter/Dart compatibility.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --check server.js && node --check lib/pubdev-client.js && echo 'Syntax OK'"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "undici": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

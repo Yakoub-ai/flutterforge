@@ -1,0 +1,81 @@
+name: Android Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Build type: appbundle or apk"
+        required: false
+        default: "appbundle"
+
+jobs:
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run analyzer
+        run: flutter analyze --no-fatal-infos
+
+      # ── Release signing ──────────────────────────────────────────────────────
+      # To enable release signing:
+      # 1. Base64-encode your keystore: base64 < my-release-key.jks > keystore.b64
+      # 2. Add the following repository secrets:
+      #    ANDROID_KEYSTORE_BASE64   — base64-encoded keystore file
+      #    ANDROID_KEYSTORE_PASSWORD — keystore password
+      #    ANDROID_KEY_ALIAS         — key alias
+      #    ANDROID_KEY_PASSWORD      — key password
+      # 3. Uncomment the "Set up signing" and "Build signed appbundle" steps below,
+      #    and comment out the unsigned build steps.
+
+      # - name: Set up signing
+      #   run: |
+      #     echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode \
+      #       > android/app/release.jks
+      #     echo "storeFile=release.jks"          >> android/key.properties
+      #     echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+      #                                           >> android/key.properties
+      #     echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" \
+      #                                           >> android/key.properties
+      #     echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" \
+      #                                           >> android/key.properties
+
+      - name: Build App Bundle (unsigned)
+        run: flutter build appbundle --release
+
+      - name: Build APK (unsigned, split by ABI)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Upload App Bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-appbundle
+          path: build/app/outputs/bundle/release/*.aab
+          retention-days: 14
+
+      - name: Upload APKs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apks
+          path: build/app/outputs/flutter-apk/*.apk
+          retention-days: 14

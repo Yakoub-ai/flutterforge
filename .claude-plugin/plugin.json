@@ -1,0 +1,58 @@
+{
+  "name": "flutterforge",
+  "version": "0.3.0",
+  "description": "End-to-end Flutter mobile application development workflow plugin for Claude Code. Guides teams from idea to release-ready app with specialized agents, skills, hooks, and subagent-driven workflows.",
+  "author": {
+    "name": "George Yakoub",
+    "url": "https://github.com/Yakoub-ai"
+  },
+  "repository": "https://github.com/Yakoub-ai/flutterforge",
+  "homepage": "https://github.com/Yakoub-ai/flutterforge#readme",
+  "license": "MIT",
+  "keywords": [
+    "flutter",
+    "dart",
+    "mobile",
+    "android",
+    "ios",
+    "firebase",
+    "supabase",
+    "riverpod",
+    "bloc",
+    "clean-architecture",
+    "ux",
+    "testing",
+    "debugging",
+    "release",
+    "workflow"
+  ],
+  "commands": [
+    "./commands/flutterforge.md",
+    "./commands/plan-flutter-app.md",
+    "./commands/new-flutter-app.md",
+    "./commands/build-flutter-feature.md",
+    "./commands/audit-flutter-app.md",
+    "./commands/debug-flutter.md",
+    "./commands/generate-tests.md",
+    "./commands/improve-ux.md",
+    "./commands/prepare-release.md",
+    "./commands/refactor-flutter.md",
+    "./commands/flutter-accessibility.md"
+  ],
+  "agents": [
+    "./agents/product-strategist.md",
+    "./agents/flutter-architect.md",
+    "./agents/ux-mobile-designer.md",
+    "./agents/flutter-implementation-engineer.md",
+    "./agents/state-management-specialist.md",
+    "./agents/api-integration-engineer.md",
+    "./agents/flutter-test-engineer.md",
+    "./agents/flutter-debugger.md",
+    "./agents/mobile-performance-engineer.md",
+    "./agents/mobile-security-reviewer.md",
+    "./agents/release-engineer.md",
+    "./agents/codebase-auditor.md"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}

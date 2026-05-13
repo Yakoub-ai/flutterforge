@@ -1,0 +1,89 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# iOS builds require a macOS runner.
+# GitHub-hosted macOS runners are billed at ~10× the Linux rate.
+# Consider running this workflow only on main pushes or via workflow_dispatch.
+
+jobs:
+  build-ios:
+    name: Build iOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.x"
+          channel: "stable"
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios
+        run: pod install
+
+      - name: Run analyzer
+        run: flutter analyze --no-fatal-infos
+
+      # ── Code signing ─────────────────────────────────────────────────────────
+      # Unsigned builds (no-codesign) are fine for CI artifact verification.
+      # To produce a signed IPA for TestFlight or App Store:
+      # 1. Export your Distribution certificate as a .p12 file and base64-encode it.
+      # 2. Export your provisioning profile and base64-encode it.
+      # 3. Add the following repository secrets:
+      #    IOS_CERTIFICATE_BASE64        — base64 .p12 certificate
+      #    IOS_CERTIFICATE_PASSWORD      — .p12 password
+      #    IOS_PROVISIONING_PROFILE_B64  — base64 provisioning profile
+      #    IOS_KEYCHAIN_PASSWORD         — a new password for the temp keychain
+      # 4. Uncomment the "Set up signing" step and use "flutter build ipa" instead.
+
+      # - name: Set up code signing
+      #   run: |
+      #     KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+      #     security create-keychain -p "${{ secrets.IOS_KEYCHAIN_PASSWORD }}" \
+      #       "$KEYCHAIN_PATH"
+      #     security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+      #     security unlock-keychain -p "${{ secrets.IOS_KEYCHAIN_PASSWORD }}" \
+      #       "$KEYCHAIN_PATH"
+      #     echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode \
+      #       > "$RUNNER_TEMP/certificate.p12"
+      #     security import "$RUNNER_TEMP/certificate.p12" \
+      #       -P "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" \
+      #       -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+      #     security list-keychain -d user -s "$KEYCHAIN_PATH"
+      #     PP_PATH="$RUNNER_TEMP/profile.mobileprovision"
+      #     echo "${{ secrets.IOS_PROVISIONING_PROFILE_B64 }}" \
+      #       | base64 --decode > "$PP_PATH"
+      #     mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+      #     cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Build iOS (no code signing)
+        run: flutter build ios --release --no-codesign
+
+      # Uncomment to build a signed IPA after setting up code signing above:
+      # - name: Build IPA
+      #   run: flutter build ipa --release
+
+      - name: Upload iOS build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios/iphoneos/*.app
+          retention-days: 7
+
+      # Uncomment to upload signed IPA:
+      # - name: Upload IPA artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ios-ipa
+      #     path: build/ios/ipa/*.ipa
+      #     retention-days: 7
