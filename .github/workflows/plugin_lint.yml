@@ -47,35 +47,7 @@ jobs:
           failed=0
           for f in skills/*/SKILL.md; do
             [ -f "$f" ] || continue
-            result=$(python3 - "$f" <<'PYEOF'
-import sys, re
-
-path = sys.argv[1]
-try:
-    content = open(path, encoding="utf-8").read()
-except OSError as e:
-    print(f"FAIL: {path} could not be read: {e}")
-    sys.exit(1)
-
-if not content.startswith("---\n"):
-    print(f"FAIL: {path} missing YAML frontmatter opening ---")
-    sys.exit(1)
-
-# Extract content between first pair of ---
-parts = content.split("---")
-if len(parts) < 3:
-    print(f"FAIL: {path} frontmatter not closed with ---")
-    sys.exit(1)
-
-front = parts[1]
-for field in ("name:", "description:"):
-    if field not in front:
-        print(f"FAIL: {path} missing '{field}' in frontmatter")
-        sys.exit(1)
-
-print(f"OK: {path}")
-PYEOF
-)
+            result=$(python3 scripts/check_skill_frontmatter.py "$f")
             echo "$result"
             echo "$result" | grep -q "^FAIL" && failed=1
           done
@@ -88,34 +60,7 @@ PYEOF
           failed=0
           for f in agents/*.md; do
             [ -f "$f" ] || continue
-            result=$(python3 - "$f" <<'PYEOF'
-import sys
-
-path = sys.argv[1]
-try:
-    content = open(path, encoding="utf-8").read()
-except OSError as e:
-    print(f"FAIL: {path} could not be read: {e}")
-    sys.exit(1)
-
-if not content.startswith("---\n"):
-    print(f"FAIL: {path} missing YAML frontmatter opening ---")
-    sys.exit(1)
-
-parts = content.split("---")
-if len(parts) < 3:
-    print(f"FAIL: {path} frontmatter not closed with ---")
-    sys.exit(1)
-
-front = parts[1]
-for field in ("name:", "description:", "model:"):
-    if field not in front:
-        print(f"FAIL: {path} missing '{field}' in frontmatter")
-        sys.exit(1)
-
-print(f"OK: {path}")
-PYEOF
-)
+            result=$(python3 scripts/check_agent_frontmatter.py "$f")
             echo "$result"
             echo "$result" | grep -q "^FAIL" && failed=1
           done
@@ -128,33 +73,7 @@ PYEOF
           failed=0
           for f in commands/*.md; do
             [ -f "$f" ] || continue
-            result=$(python3 - "$f" <<'PYEOF'
-import sys
-
-path = sys.argv[1]
-try:
-    content = open(path, encoding="utf-8").read()
-except OSError as e:
-    print(f"FAIL: {path} could not be read: {e}")
-    sys.exit(1)
-
-if not content.startswith("---\n"):
-    print(f"FAIL: {path} missing YAML frontmatter opening ---")
-    sys.exit(1)
-
-parts = content.split("---")
-if len(parts) < 3:
-    print(f"FAIL: {path} frontmatter not closed with ---")
-    sys.exit(1)
-
-front = parts[1]
-if "description:" not in front:
-    print(f"FAIL: {path} missing 'description:' in frontmatter")
-    sys.exit(1)
-
-print(f"OK: {path}")
-PYEOF
-)
+            result=$(python3 scripts/check_command_frontmatter.py "$f")
             echo "$result"
             echo "$result" | grep -q "^FAIL" && failed=1
           done
@@ -163,49 +82,10 @@ PYEOF
       # ── Manifest file existence ──────────────────────────────────────────────
 
       - name: Verify all manifest files exist
-        run: |
-          python3 - <<'PYEOF'
-import json, os, sys
-
-try:
-    manifest = json.load(open(".claude-plugin/plugin.json", encoding="utf-8"))
-except (OSError, json.JSONDecodeError) as e:
-    print(f"FAIL: could not load plugin.json: {e}")
-    sys.exit(1)
-
-errors = []
-
-for path in manifest.get("commands", []):
-    # Normalise ./commands/foo.md -> commands/foo.md
-    normalised = path.lstrip("./")
-    if not os.path.exists(normalised):
-        errors.append(f"Missing command file: {path}")
-
-for path in manifest.get("agents", []):
-    normalised = path.lstrip("./")
-    if not os.path.exists(normalised):
-        errors.append(f"Missing agent file: {path}")
-
-if errors:
-    for e in errors:
-        print(e)
-    sys.exit(1)
-
-print(f"All manifest files present ({len(manifest.get('commands', []))} commands, "
-      f"{len(manifest.get('agents', []))} agents)")
-PYEOF
+        run: python3 scripts/verify_manifest_files.py
 
       - name: Verify flutter-accessibility command is registered
-        run: |
-          python3 - <<'PYEOF'
-import json, sys
-manifest = json.load(open(".claude-plugin/plugin.json", encoding="utf-8"))
-commands = manifest.get("commands", [])
-if not any("flutter-accessibility" in c for c in commands):
-    print("FAIL: commands/flutter-accessibility.md not registered in plugin.json")
-    sys.exit(1)
-print("OK: flutter-accessibility command is registered")
-PYEOF
+        run: python3 scripts/verify_flutter_accessibility.py
 
       # ── Node.js hook scripts ──────────────────────────────────────────────────
 

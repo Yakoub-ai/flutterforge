@@ -55,11 +55,9 @@ Then in Claude Code, run:
 ### Option 2: Marketplace
 
 ```
-/plugin marketplace add <marketplace-source>
-/plugin install flutterforge@<marketplace-name>
+/plugin marketplace add https://github.com/Yakoub-ai/flutterforge
+/plugin install flutterforge
 ```
-
-Use the marketplace source/name published for your team or community catalog. For local development, use the clone method above.
 
 ### Verify installation
 
