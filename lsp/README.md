@@ -6,12 +6,24 @@ Dart Analysis Server for both VS Code and JetBrains IDEs.
 
 ---
 
+## Plugin LSP Server
+
+FlutterForge ships `.lsp.json` with a Dart language-server definition:
+
+```bash
+dart language-server --protocol=lsp
+```
+
+Claude Code can use this server when plugin LSP support is enabled. If the CLI cannot start
+the server, FlutterForge still falls back to the grep/analyze workflow below.
+
+---
+
 ## What "LSP-Guided" Means in FlutterForge
 
-FlutterForge is a Claude Code plugin — it does not have direct access to a running
-Language Server Protocol daemon. Instead, "LSP-guided" means that commands like
-`/flutterforge:refactor-flutter` instruct Claude to **simulate** what an IDE rename or
-find-references operation would do:
+FlutterForge commands still treat LSP as an assistive signal, not the only source of truth.
+Commands like `/flutterforge:refactor-flutter` instruct Claude to combine Dart LSP diagnostics
+with the conservative fallback workflow an IDE rename or find-references operation would use:
 
 1. **Grep/Glob for all call sites** — Claude searches `.dart` files for every reference
    to the symbol being changed: direct calls, type annotations, string literals in routes
@@ -23,7 +35,7 @@ find-references operation would do:
 4. **Re-run `flutter analyze`** — after edits, the analysis server is invoked in batch
    mode to confirm no residual type errors or unresolved references remain.
 
-This approach cannot match a live LSP's symbol index for very large monorepos, but it
+The fallback approach cannot match a live LSP's symbol index for very large monorepos, but it
 covers the common cases (renaming a widget, extracting a method, moving a file) reliably.
 
 ---

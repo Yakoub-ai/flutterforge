@@ -18,6 +18,7 @@ FlutterForge guides development teams from idea to release-ready Flutter app usi
 - [Hooks](#hooks)
 - [MCP Integrations](#mcp-integrations)
 - [Configuration](#configuration)
+- [Portable Skills and Agents](#portable-skills-and-agents)
 - [Templates](#templates)
 - [Examples](#examples)
 - [Contributing](#contributing)
@@ -229,9 +230,45 @@ Maintainer validation before release:
 
 ```bash
 claude plugin validate .
+python3 -m json.tool .lsp.json > /dev/null
+bash skills.sh list
 node --check hooks/lib-node/*.cjs
 node --check mcp-servers/pub-dev-mcp/server.js
 node --check mcp-servers/pub-dev-mcp/lib/pubdev-client.js
+```
+
+---
+
+## Portable Skills and Agents
+
+FlutterForge can also export its `skills/` and `agents/` without installing the full Claude Code plugin. This is useful for Codex and other CLIs that can read skill or agent prompt directories.
+
+From a local checkout:
+
+```bash
+bash skills.sh install --preset codex
+bash skills.sh install --preset generic
+bash skills.sh list
+```
+
+From a remote script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Yakoub-ai/flutterforge/main/skills.sh | bash -s -- install --preset generic
+```
+
+Presets:
+
+| Preset | Skills directory | Agents directory |
+|---|---|---|
+| `claude` | `~/.claude/skills` | `~/.claude/agents` |
+| `codex` | `${CODEX_HOME:-~/.codex}/skills` | `${CODEX_HOME:-~/.codex}/agents` |
+| `generic` | `~/.agents/skills` | `~/.agents/agents` |
+
+Custom directories are supported:
+
+```bash
+bash skills.sh install --skills-dir ~/.mycli/skills --agents-dir ~/.mycli/agents
 ```
 
 ---

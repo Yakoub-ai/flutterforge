@@ -20,7 +20,7 @@ const command = (input.tool_input && input.tool_input.command) || '';
 // This hook is wired to all Bash calls; gate here on git commit
 if (toolName !== 'Bash' || !/\bgit\s+commit\b/.test(command)) allow();
 
-const root = findFlutterProjectRoot(process.cwd());
+const root = findFlutterProjectRoot(input.cwd || process.cwd());
 if (!root) allow();
 
 const failures = [];

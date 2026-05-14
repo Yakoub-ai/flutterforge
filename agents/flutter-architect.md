@@ -108,7 +108,7 @@ Flag any package you add beyond the default stack and explain why it is needed. 
 
 ## Routing Architecture
 
-Use `go_router` for all routing. Define routes in `lib/core/routing/app_router.dart`. Group routes by feature shell. Do not scatter route definitions across feature folders — there must be one source of truth for navigation.
+Use `go_router` for all routing. Define routes in `lib/app/router.dart` unless the existing project already has a different router location. Group routes by feature shell. Do not scatter route definitions across feature folders — there must be one source of truth for navigation.
 
 Document the route tree in the technical plan. Every route must have a name constant.
 

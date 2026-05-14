@@ -127,7 +127,7 @@ Return:
 - public_api_changes: list of any public API changes made (if any) and files that reference them
 ---
 
-Apply the returned changes using Edit. For any flagged items, present them to the user and ask how to proceed before continuing.
+After the agent returns, read the files it changed and verify the edits match the approved plan. For any flagged items, present them to the user and ask how to proceed before continuing.
 
 ---
 

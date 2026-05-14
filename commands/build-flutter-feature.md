@@ -178,7 +178,7 @@ Notes from implementation agent: [paste "Anything the test agent needs to know" 
 [YOUR TASK]:
 Write tests for the feature. Mirror the file structure — if the feature is at lib/features/auth/, tests go in test/features/auth/.
 
-1. **Unit tests** — For each repository implementation and use case/domain service, write unit tests using mocktail or mockito (check which is in pubspec.yaml; if neither, use mockito). Test success path and at least one failure/error path per method.
+1. **Unit tests** — For each repository implementation and use case/domain service, write unit tests using the project's existing mock library. Prefer mocktail; if neither mocktail nor mockito is present, ask before adding a new test dependency instead of silently choosing one. Test success path and at least one failure/error path per method.
 2. **Widget tests** — For the main screen widget(s) created, write widget tests that: render the screen in idle/loading/error/success states, simulate a primary user interaction (e.g. button tap, form submit), assert the expected outcome.
 3. **Provider/BLoC tests** — If using Riverpod, write ProviderContainer-based tests for the feature's providers. If using BLoC, write bloc_test tests.
 

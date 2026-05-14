@@ -32,11 +32,17 @@ function findFlutterProjectRoot(startDir) {
 }
 
 /**
- * Write a PreToolUse block response. Claude Code only processes JSON output
+ * Write a PreToolUse deny response. Claude Code only processes JSON output
  * on exit 0, so blocking hooks must not return a generic non-zero status.
  */
 function block(reason) {
-  process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'deny',
+      permissionDecisionReason: reason,
+    },
+  }) + '\n');
   process.exit(0);
 }
 
@@ -70,4 +76,18 @@ function runCmd(cmd, args, cwd, timeoutMs) {
   };
 }
 
-module.exports = { readStdin, findFlutterProjectRoot, block, allow, shouldSkip, runCmd };
+function resolveToolPath(filePath, cwd) {
+  if (!filePath) return '';
+  if (path.isAbsolute(filePath)) return filePath;
+  return path.resolve(cwd || process.cwd(), filePath);
+}
+
+module.exports = {
+  readStdin,
+  findFlutterProjectRoot,
+  block,
+  allow,
+  shouldSkip,
+  runCmd,
+  resolveToolPath,
+};

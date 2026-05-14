@@ -32,6 +32,9 @@
 - [ ] Verbose logging of sensitive data removed or gated behind debug flag
 - [ ] All feature flags for this release set to correct values in production config
 - [ ] Release build tested on a physical device (not just simulator/emulator)
+- [ ] Release builds use `--obfuscate --split-debug-info` and debug symbols are archived
+- [ ] Crash reporting / release health dashboard is configured and visible to the release owner
+- [ ] Staged rollout, rollback threshold, and first-24-hour monitoring owner are documented
 
 ---
 
@@ -41,6 +44,7 @@
 
 **App Identity**
 - [ ] `applicationId` in `android/app/build.gradle` is the correct production ID
+- [ ] `targetSdkVersion` / `targetSdk` meets current Google Play policy. As of 2026-05-14, new apps and updates must target Android 15 / API level 35 or higher unless an exception applies
 - [ ] `versionName` and `versionCode` match `pubspec.yaml` (or are derived from it)
 - [ ] App name in `android/app/src/main/res/values/strings.xml` is correct
 
@@ -74,6 +78,7 @@
 - [ ] Content rating is current
 - [ ] Target API level meets Google's current requirements
 - [ ] Data safety section accurate for data this release collects
+- [ ] Play Data Safety answers match the app's actual data collection, sharing, encryption, and deletion behavior
 
 ---
 
@@ -101,6 +106,7 @@
 **Permissions (Info.plist)**
 - [ ] Every `NS*UsageDescription` key has a clear, user-facing explanation (not a developer note)
 - [ ] No permission keys present for entitlements not actually used in this build
+- [ ] `PrivacyInfo.xcprivacy` present when required-reason APIs or third-party SDK requirements apply
 - [ ] App Tracking Transparency (`NSUserTrackingUsageDescription`) included if any tracking used
 
 **Dependencies**
@@ -128,6 +134,7 @@
 
 - [ ] Monitor crash reporting dashboard for the first 24 hours after release
 - [ ] Check Analytics for anomalous drop-off in core flows
+- [ ] Pause or roll back staged rollout if crash-free sessions, ANRs, failed purchases, or core conversion cross the documented threshold
 - [ ] Tag release in git: `git tag v[VERSION]` and push
 - [ ] Archive this checklist in the release notes folder or attach to the release PR
 - [ ] Close any release milestone in the issue tracker

@@ -5,7 +5,7 @@
 // Always exits 0 (non-blocking) — pub get may fail on incomplete files.
 
 const path = require('path');
-const { readStdin, findFlutterProjectRoot, runCmd } = require('./_common.cjs');
+const { readStdin, findFlutterProjectRoot, runCmd, resolveToolPath } = require('./_common.cjs');
 
 const input = readStdin();
 const filePath = (input.tool_input && input.tool_input.file_path) || '';
@@ -13,7 +13,8 @@ const filePath = (input.tool_input && input.tool_input.file_path) || '';
 // Only act on pubspec.yaml edits
 if (!filePath.endsWith('pubspec.yaml')) process.exit(0);
 
-const root = findFlutterProjectRoot(path.dirname(path.resolve(filePath)));
+const resolvedFilePath = resolveToolPath(filePath, input.cwd);
+const root = findFlutterProjectRoot(path.dirname(resolvedFilePath) || input.cwd);
 if (!root) process.exit(0);
 
 process.stdout.write('FlutterForge [pubspec_sync]: Running flutter pub get...\n');

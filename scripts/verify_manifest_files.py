@@ -8,15 +8,36 @@ except (OSError, json.JSONDecodeError) as e:
 
 errors = []
 
+def normalise_path(path):
+    return path[2:] if path.startswith("./") else path
+
 for path in manifest.get("commands", []):
-    normalised = path.lstrip("./")
+    normalised = normalise_path(path)
     if not os.path.exists(normalised):
         errors.append(f"Missing command file: {path}")
 
 for path in manifest.get("agents", []):
-    normalised = path.lstrip("./")
+    normalised = normalise_path(path)
     if not os.path.exists(normalised):
         errors.append(f"Missing agent file: {path}")
+
+component_paths = {
+    "skills": manifest.get("skills"),
+    "hooks": manifest.get("hooks"),
+    "mcpServers": manifest.get("mcpServers"),
+    "lspServers": manifest.get("lspServers"),
+}
+
+for field, value in component_paths.items():
+    if not value:
+        continue
+    values = value if isinstance(value, list) else [value]
+    for path in values:
+        if not isinstance(path, str):
+            continue
+        normalised = normalise_path(path)
+        if not os.path.exists(normalised):
+            errors.append(f"Missing {field} path: {path}")
 
 if errors:
     for e in errors:

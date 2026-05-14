@@ -38,31 +38,38 @@ Work through each item and mark status (pass / fail / warning):
 1. Application ID: read `android/app/build.gradle` — `applicationId` must not be `com.example.*`.
    Flag any example namespace as a blocker.
 
-2. Signing configuration: verify the `key.properties` pattern is in use.
+2. Target SDK: verify `targetSdkVersion` / `targetSdk` is current for Google Play.
+   As of 2026-05-14, new apps and updates must target Android 15 / API level 35 or higher
+   unless a Play policy exception applies. Flag older targets as release blockers.
+
+3. Signing configuration: verify the `key.properties` pattern is in use.
    - `android/key.properties` should exist (not committed — check `.gitignore`)
    - `android/app/build.gradle` reads it via `Properties properties = new Properties()`
    - `signingConfigs.release` is defined and referenced by `buildTypes.release`
    - If the pattern is absent, document the correct setup steps (do not create keystore files)
 
-3. Launcher icons: check for `flutter_launcher_icons` in `pubspec.yaml` dev_dependencies and
+4. Launcher icons: check for `flutter_launcher_icons` in `pubspec.yaml` dev_dependencies and
    a `flutter_icons` or `flutter_launcher_icons` config section. Android adaptive icons require
    both `adaptive_icon_foreground` and `adaptive_icon_background`. Without adaptive icons, the
    Play Store shows a white box on some Android versions.
 
-4. ProGuard / R8: in `android/app/build.gradle` release buildType, `minifyEnabled` should be
+5. ProGuard / R8: in `android/app/build.gradle` release buildType, `minifyEnabled` should be
    `true` and `shrinkResources` should be `true`. Verify a `proguard-rules.pro` exists.
 
-5. Permissions review: read `AndroidManifest.xml` — flag `INTERNET` (expected), `WRITE_EXTERNAL_STORAGE`
+6. Permissions review: read `AndroidManifest.xml` — flag `INTERNET` (expected), `WRITE_EXTERNAL_STORAGE`
    (deprecated on Android 10+, flag if present), `READ_CONTACTS` / `READ_CALL_LOG` (high-risk,
    require justification).
 
-6. Release build command:
+7. Play Console readiness: verify the release checklist covers Data Safety declarations, privacy
+   policy URL, app category, content rating, screenshots, and staged rollout plan.
+
+8. Release build command:
    ```
    flutter build appbundle --release --obfuscate --split-debug-info=./debug-symbols/
    ```
    Verify output exists at: `build/app/outputs/bundle/release/app-release.aab`
 
-7. Metadata: verify `android/app/src/main/res/values/strings.xml` has a meaningful `app_name`.
+9. Metadata: verify `android/app/src/main/res/values/strings.xml` has a meaningful `app_name`.
 
 ## iOS Release Checklist
 
@@ -86,10 +93,15 @@ Work through each item and mark status:
    (e.g., `NSCameraUsageDescription`). App Store Review rejects any app where a permission is
    used without a description. Read `Info.plist` and list all permission keys found.
 
-6. CocoaPods: verify `ios/Podfile.lock` exists and is committed. Run:
+6. Privacy manifest and App Privacy: check whether `ios/Runner/PrivacyInfo.xcprivacy` exists
+   when required-reason APIs or third-party SDK manifests require it. Ensure App Store privacy
+   details are represented in the release checklist. If the app tracks users across apps or
+   websites, verify ATT status and `NSUserTrackingUsageDescription`.
+
+7. CocoaPods: verify `ios/Podfile.lock` exists and is committed. Run:
    `cd ios && pod install --repo-update` to confirm clean install (no errors).
 
-7. Release build command:
+8. Release build command:
    ```
    flutter build ios --release --obfuscate --split-debug-info=./debug-symbols/
    ```
@@ -113,16 +125,17 @@ Triggers on every push and pull request. Steps:
 Triggers on push to `main` or `release/*` branches. Steps:
 - Checkout
 - Flutter setup
-- Decode keystore from base64 secret: `echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks`
+- Decode keystore from base64 secret: `echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks`
 - Write `key.properties` from secrets
 - `flutter build appbundle --release --obfuscate --split-debug-info=./debug-symbols/`
 - Upload artifact: `build/app/outputs/bundle/release/app-release.aab`
+- Upload debug symbols artifact from `debug-symbols/`
 
 Required GitHub secrets (document in a comment at top of file):
-- `KEYSTORE_BASE64` — base64-encoded keystore file
-- `KEY_ALIAS` — key alias
-- `KEY_PASSWORD` — key password
-- `STORE_PASSWORD` — keystore password
+- `ANDROID_KEYSTORE_BASE64` — base64-encoded keystore file
+- `ANDROID_KEY_ALIAS` — key alias
+- `ANDROID_KEY_PASSWORD` — key password
+- `ANDROID_KEYSTORE_PASSWORD` — keystore password
 
 ### ios_build.yml
 Triggers on push to `main` or `release/*` branches. Uses `macos-latest` runner. Steps:
@@ -130,8 +143,9 @@ Triggers on push to `main` or `release/*` branches. Uses `macos-latest` runner. 
 - Flutter setup
 - `flutter pub get`
 - `cd ios && pod install`
-- `flutter build ios --release --no-codesign`
+- `flutter build ios --release --no-codesign --obfuscate --split-debug-info=./debug-symbols/`
 - Upload the build products as artifact for manual Xcode archive
+- Upload debug symbols artifact from `debug-symbols/`
 
 Note in the file: full automated codesigning for App Store requires additional setup with
 `fastlane match` or Apple certificates in CI — document the approach, do not implement
@@ -146,6 +160,8 @@ Produce `docs/release/release_checklist.md` with:
 3. iOS release steps with commands
 4. CI/CD secret configuration instructions
 5. Post-release monitoring steps (crash dashboard, analytics baseline)
+6. Store privacy requirements (App Store privacy details, Play Data Safety, ATT where applicable)
+7. Rollout plan (staged rollout percentage, rollback threshold, first-24-hour monitoring owner)
 
 ## Never Do
 

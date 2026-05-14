@@ -6,7 +6,8 @@ FlutterForge is a Claude Code plugin. Contributions are welcome — skills, agen
 
 ```
 flutterforge/
-├── .claude-plugin/plugin.json   # Plugin manifest — update when adding commands/agents
+├── .claude-plugin/plugin.json   # Plugin manifest — update when adding command/agent paths or component dirs
+├── skills.sh                    # Portable installer for skills/agents outside Claude Code
 ├── commands/                    # Slash commands (flat — one .md per command)
 ├── agents/                      # Specialized agents (flat — one .md per agent)
 ├── skills/                      # Reusable skills (one folder per skill)
@@ -35,7 +36,8 @@ flutterforge/
 3. Write the skill body: workflow steps, rules, output format
 4. Test by invoking the skill description phrase in a Flutter project context
 
-No changes to `plugin.json` are needed for skills — they autoload by description matching.
+No per-skill changes to `plugin.json` are needed — the manifest points at `./skills/`.
+Run `bash skills.sh list` after adding a skill to confirm it is exportable for other CLIs.
 
 ## Adding an Agent
 
@@ -59,6 +61,7 @@ No changes to `plugin.json` are needed for skills — they autoload by descripti
    ```
 3. Write the agent system prompt
 4. Add the agent path to `plugin.json` `agents[]` array
+5. Run `bash skills.sh list` to confirm the agent is exportable for other CLIs
 
 ## Adding a Command
 

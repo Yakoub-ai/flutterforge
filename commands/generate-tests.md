@@ -89,7 +89,7 @@ For each file in the list above, generate comprehensive tests. Follow this proce
 **Step 3 — Write the tests:**
 - Place each test file at `test/[mirror-of-lib-path]_test.dart`. Example: `lib/features/auth/data/auth_repository.dart` → `test/features/auth/data/auth_repository_test.dart`.
 - Match import style, group() nesting, and setUp() patterns from the reference test file exactly.
-- Use the project's mock library (mocktail preferred if available, otherwise mockito). Generate mock classes for any dependencies injected via constructor.
+- Use the project's mock library. Prefer mocktail; if neither mocktail nor mockito is present, ask before adding a test dependency. Generate mock classes for any dependencies injected via constructor.
 - Do NOT use `any()` from mockito if mocktail is the library — use `any()` from mocktail.
 - Coverage targets: repositories and use cases → aim for 90% method coverage; blocs/notifiers → cover all state transitions; widgets → cover key states, not every pixel.
 

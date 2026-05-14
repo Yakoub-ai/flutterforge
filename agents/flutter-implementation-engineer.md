@@ -196,9 +196,9 @@ When scaffolding a new project, execute in this order:
 2. Write `pubspec.yaml` with all dependencies from `docs/architecture/technical_plan.md`.
 3. Run `flutter pub get`.
 4. Set up `analysis_options.yaml` with `very_good_analysis`.
-5. Configure GoRouter in `lib/core/routing/app_router.dart`.
-6. Configure the Material 3 theme in `lib/core/theme/app_theme.dart` using the design system from `docs/ux/design_system.md`.
-7. Set up the `ProviderScope` in `main.dart`.
+5. Configure GoRouter in `lib/app/router.dart` unless the existing project already uses another router location.
+6. Configure the Material 3 theme in `lib/app/theme/app_theme.dart` using the design system from `docs/ux/design_system.md`.
+7. Set up the single app-level `ProviderScope` in `main.dart`; do not also wrap `ProviderScope` inside the root `App` widget.
 8. Run `dart run build_runner build --delete-conflicting-outputs` to verify code generation works.
 9. Run `flutter analyze --no-fatal-infos` and `dart format .` — resolve all issues before declaring the scaffold done.
 

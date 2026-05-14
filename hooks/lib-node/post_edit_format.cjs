@@ -5,17 +5,18 @@
 // Always exits 0 (non-blocking) — formatting is advisory.
 
 const path = require('path');
-const { readStdin, findFlutterProjectRoot, runCmd } = require('./_common.cjs');
+const { readStdin, findFlutterProjectRoot, runCmd, resolveToolPath } = require('./_common.cjs');
 
 const input = readStdin();
 const filePath = (input.tool_input && input.tool_input.file_path) || '';
 
 if (!filePath.endsWith('.dart')) process.exit(0);
 
-const root = findFlutterProjectRoot(path.dirname(path.resolve(filePath)));
+const resolvedFilePath = resolveToolPath(filePath, input.cwd);
+const root = findFlutterProjectRoot(path.dirname(resolvedFilePath) || input.cwd);
 if (!root) process.exit(0);
 
-const result = runCmd('dart', ['format', '--fix', filePath], root, 15000);
+const result = runCmd('dart', ['format', '--fix', resolvedFilePath], root, 15000);
 if (result.exitCode !== 0) {
   // Inform Claude but never block
   process.stdout.write(

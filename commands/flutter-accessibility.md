@@ -87,6 +87,8 @@ Return:
 - Skipped findings and why
 ---
 
+After the agent returns, read the modified files and verify that the changes are limited to accessibility and sizing constraints. If the agent reports BLOCKED, stop and present the blocker to the user.
+
 ---
 
 ## Phase 4: Findings Report

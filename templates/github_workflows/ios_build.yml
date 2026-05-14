@@ -67,11 +67,11 @@ jobs:
       #     cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build iOS (no code signing)
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/debug-symbols/ios
 
       # Uncomment to build a signed IPA after setting up code signing above:
       # - name: Build IPA
-      #   run: flutter build ipa --release
+      #   run: flutter build ipa --release --obfuscate --split-debug-info=build/debug-symbols/ios
 
       - name: Upload iOS build artifact
         uses: actions/upload-artifact@v4
@@ -79,6 +79,13 @@ jobs:
           name: ios-build
           path: build/ios/iphoneos/*.app
           retention-days: 7
+
+      - name: Upload iOS debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-debug-symbols
+          path: build/debug-symbols/ios
+          retention-days: 90
 
       # Uncomment to upload signed IPA:
       # - name: Upload IPA artifact

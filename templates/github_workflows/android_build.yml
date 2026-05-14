@@ -61,10 +61,10 @@ jobs:
       #                                           >> android/key.properties
 
       - name: Build App Bundle (unsigned)
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release --obfuscate --split-debug-info=build/debug-symbols/android
 
       - name: Build APK (unsigned, split by ABI)
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/debug-symbols/android
 
       - name: Upload App Bundle artifact
         uses: actions/upload-artifact@v4
@@ -79,3 +79,10 @@ jobs:
           name: android-apks
           path: build/app/outputs/flutter-apk/*.apk
           retention-days: 14
+
+      - name: Upload Android debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-symbols
+          path: build/debug-symbols/android
+          retention-days: 90

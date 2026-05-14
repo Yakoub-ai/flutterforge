@@ -10,6 +10,16 @@ The user's app idea: $ARGUMENTS
 
 If `$ARGUMENTS` is empty, ask: "What app do you want to plan? Describe it in a sentence or two." and stop until the user replies.
 
+Before launching agents, check whether the idea clearly states these product-critical facts:
+- Target platforms: iOS, Android, or both
+- Backend/data source: Firebase, Supabase, REST API, local-only, or unknown
+- Account/auth needs and any payments/subscriptions
+- Offline requirements
+- Privacy-sensitive data or device permissions (location, camera, contacts, health, microphone)
+- Timeline and one measurable success metric
+
+If two or more facts are missing, ask a concise follow-up and wait for the user. If only one fact is missing, proceed and mark it as an assumption in the product brief.
+
 ---
 
 ## Phase 1: Product Discovery
@@ -22,11 +32,12 @@ You are acting as the Product Strategist for the FlutterForge `/flutterforge:pla
 [CONTEXT]:
 App idea: $ARGUMENTS
 Output directory: docs/product/ (relative to the current working directory)
+Document status: draft until explicitly approved by the user
 
 [YOUR TASK]:
 Produce three planning documents and write them to docs/product/:
 
-1. **app_brief.md** — App name, one-line pitch, problem statement, target users, core value proposition, success metrics (3–5), and out-of-scope items for v1.
+1. **app_brief.md** — App name, one-line pitch, problem statement, target platforms, backend assumptions, account/auth/payment needs, privacy-sensitive data, device permissions, target users, core value proposition, success metrics (3–5), and out-of-scope items for v1.
 2. **user_stories.md** — 10–15 user stories in "As a [user], I want to [action] so that [outcome]" format, grouped by epic.
 3. **mvp_scope.md** — Features ranked as Must/Should/Could/Won't (MoSCoW), with a recommended MVP cutline and estimated complexity (S/M/L) per feature.
 

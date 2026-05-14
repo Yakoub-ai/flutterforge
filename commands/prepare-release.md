@@ -40,11 +40,13 @@ Task: Perform a complete release readiness audit:
 
 Android (skip if --ios-only):
 - pubspec.yaml: version field present and follows semver (e.g. 1.0.0+1)
-- android/app/build.gradle: applicationId set (not com.example.*), versionCode + versionName wired to Flutter
+- android/app/build.gradle or android/app/build.gradle.kts: applicationId set (not com.example.*), versionCode + versionName wired to Flutter
+- targetSdkVersion/targetSdk is current for Google Play submission. As of 2026-05-14, new apps and updates must target Android 15 / API level 35 or higher unless a platform-specific exception applies.
 - android/app/src/main/AndroidManifest.xml: permissions declared, no debug-only permissions in release manifest
 - App icons: android/app/src/main/res/mipmap-* directories have non-default icons
 - Signing: key.properties referenced or documented; release buildType has signingConfig
 - ProGuard/R8: minifyEnabled true for release, proguard-rules.pro present
+- Play Console readiness: Data Safety answers drafted, privacy policy URL identified, app category/content rating known
 
 iOS (skip if --android-only):
 - ios/Runner/Info.plist: CFBundleIdentifier not com.example.*, CFBundleShortVersionString and CFBundleVersion present
@@ -52,9 +54,12 @@ iOS (skip if --android-only):
 - App icons: ios/Runner/Assets.xcassets/AppIcon.appiconset has all required sizes
 - Signing: DEVELOPMENT_TEAM set or documented for manual signing
 - NSUsageDescription strings present for every requested permission
+- PrivacyInfo.xcprivacy present when required-reason APIs or third-party SDK requirements apply
+- App Privacy details and ATT/NSUserTrackingUsageDescription status reviewed if the app tracks users across apps or websites
 
 Both:
 - Read .github/workflows/ and list any existing CI files found
+- Release health monitoring planned: crash reporting dashboard, analytics baseline, staged rollout criteria, and rollback threshold
 
 Return:
 - Android checklist: item | pass/fail | notes
@@ -73,6 +78,7 @@ Task: Check the following and report only on issues found:
 3. Obfuscation: check if `--obfuscate --split-debug-info` flags appear in release build commands (Makefile, scripts, CI, README)
 4. Sensitive config files: confirm google-services.json and GoogleService-Info.plist are listed in .gitignore
 5. HTTP vs HTTPS: grep for hardcoded http:// URLs in .dart files
+6. Privacy config: check for platform permission strings that imply App Store privacy disclosures or Play Data Safety entries
 
 Return:
 - Security blockers: items that must be fixed before release (critical only)
@@ -95,7 +101,7 @@ Organize all findings into three buckets:
 
 Write the checklist to `docs/release/release_checklist.md` (create `docs/release/` if needed):
 - `# Release Checklist — <app name> v<version>` with today's date
-- Sections: Blockers, Needs Attention, Passing, Security Notes
+- Sections: Blockers, Needs Attention, Passing, Security Notes, Store Privacy, Release Health Monitoring
 
 Use the `flutter-documentation` skill to update `CHANGELOG.md` with a release entry for this version (Keep a Changelog format). If `CHANGELOG.md` does not exist, create it.
 
@@ -129,16 +135,17 @@ Task: Generate three GitHub Actions workflow files with production-ready content
 2. `.github/workflows/android_build.yml`
    Triggers: push to main, workflow_dispatch
    Runner: ubuntu-latest
-   Steps: checkout, setup Java 17, setup Flutter, pub get, decode keystore from secret (base64), write key.properties, flutter build appbundle --release, upload artifact
-   Secrets needed: KEYSTORE_BASE64, KEY_ALIAS, KEY_PASSWORD, STORE_PASSWORD
+   Steps: checkout, setup Java 17, setup Flutter, pub get, decode keystore from secret (base64), write key.properties, flutter build appbundle --release --obfuscate --split-debug-info=build/debug-symbols/android, upload artifact, upload debug symbols artifact
+   Secrets needed: ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, ANDROID_KEYSTORE_PASSWORD
 
 3. `.github/workflows/ios_build.yml`
    Triggers: push to main, workflow_dispatch
    Runner: macos-latest
-   Steps: checkout, setup Flutter, pub get, flutter build ios --release --no-codesign, upload artifact (Runner.app)
+   Steps: checkout, setup Flutter, pub get, pod install, flutter build ios --release --no-codesign --obfuscate --split-debug-info=build/debug-symbols/ios, upload artifact (Runner.app), upload debug symbols artifact
    Note in comments: full codesign requires additional certificate secrets
 
 Do not overwrite any existing workflow file — if one already exists, generate it with a `.new.yml` suffix and note the conflict.
+Do not publish to TestFlight, App Store Connect, internal testing, or Google Play production from this command. Store submission remains manual unless the user explicitly requests a publishing workflow.
 
 Return: full YAML content for each file, list of all GitHub secret names that must be configured in Settings → Secrets → Actions.
 ---

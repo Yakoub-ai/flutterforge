@@ -61,10 +61,19 @@ const input = readStdin();
 const toolName = input.tool_name || '';
 const ti = input.tool_input || {};
 
+function isBareEnvFile(filePath) {
+  return path.basename(filePath || '') === '.env';
+}
+
+function commandWritesBareEnv(command) {
+  if (!command) return false;
+  return /(^|[\s;&|])(?:>|>>|tee\s+(?:-a\s+)?)['"]?\.env['"]?(?=$|[\s;&|])/.test(command);
+}
+
 if (toolName === 'Write') {
   const filePath = ti.file_path || '';
   // Block writes to bare .env files (not templates like .env.example)
-  if (path.basename(filePath) === '.env') {
+  if (isBareEnvFile(filePath)) {
     block(
       `FlutterForge: Refusing to write a bare .env file.\n` +
       `Committed .env files leak secrets. Use .env.example for templates.\n` +
@@ -74,9 +83,23 @@ if (toolName === 'Write') {
   scanLines(ti.content || '', path.basename(filePath) || 'file');
 
 } else if (toolName === 'Edit') {
+  if (isBareEnvFile(ti.file_path)) {
+    block(
+      `FlutterForge: Refusing to edit a bare .env file.\n` +
+      `Committed .env files leak secrets. Use .env.example for templates.\n` +
+      `To bypass: set FLUTTERFORGE_SKIP_SECRET_CHECK=1`
+    );
+  }
   scanLines(ti.new_string || '', path.basename(ti.file_path || 'file'));
 
 } else if (toolName === 'MultiEdit') {
+  if (isBareEnvFile(ti.file_path)) {
+    block(
+      `FlutterForge: Refusing to edit a bare .env file.\n` +
+      `Committed .env files leak secrets. Use .env.example for templates.\n` +
+      `To bypass: set FLUTTERFORGE_SKIP_SECRET_CHECK=1`
+    );
+  }
   const fileName = path.basename(ti.file_path || 'file');
   for (const edit of ti.edits || []) {
     scanLines(edit.new_string || '', fileName);
@@ -84,6 +107,13 @@ if (toolName === 'Write') {
 
 } else if (toolName === 'Bash') {
   // Scan the shell command for embedded secrets (export KEY=..., heredoc, curl -H, etc.)
+  if (commandWritesBareEnv(ti.command || '')) {
+    block(
+      `FlutterForge: Refusing to write a bare .env file from a shell command.\n` +
+      `Use .env.example for templates and keep real environment files out of git.\n` +
+      `To bypass: set FLUTTERFORGE_SKIP_SECRET_CHECK=1`
+    );
+  }
   scanLines(ti.command || '', 'bash command');
 }
 

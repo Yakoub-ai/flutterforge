@@ -89,7 +89,7 @@ Return:
 - Any concerns or flagged items that were skipped
 ---
 
-Apply the returned changes using Edit.
+After the agent returns, read the files it changed and verify the edits match the approved findings. If the agent reports flagged items, present them to the user and ask how to proceed before making any additional changes.
 
 ---
 

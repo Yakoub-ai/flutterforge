@@ -1,17 +1,20 @@
 # FlutterForge Monitors
 
-Claude Code does not currently support persistent background monitor processes in
-plugins. This directory is reserved for future monitor definitions. This document
-explains what monitors would do, how FlutterForge's hooks cover the same quality gates
-today, and how to run manual monitoring sessions.
+Claude Code supports plugin monitor definitions, but FlutterForge does not enable
+long-running Flutter monitors by default. Flutter apps often require emulators, devices,
+or platform-specific SDK state, so automatic monitors would be noisy and expensive for
+global plugin installs.
+
+This directory documents opt-in monitor ideas, how FlutterForge's hooks cover the same
+quality gates today, and how to run manual monitoring sessions.
 
 ---
 
-## What Monitors Would Do (Forward-Looking)
+## Opt-In Monitor Ideas
 
 A monitor is a long-running process that watches a stream of events and fires a callback
-when a condition is met. Once Claude Code adds monitor support, FlutterForge would ship
-three:
+when a condition is met. FlutterForge should only ship these as opt-in project-local
+definitions after they have low false-positive rates:
 
 ### `flutter_run_watcher` — Widget Rebuild Storm Detection
 
@@ -103,10 +106,9 @@ results across the five runs.
 
 ---
 
-## Speculative Monitor Definition Format
+## Candidate Monitor Definition Format
 
-When Claude Code adds monitor support, a `monitors/flutter_run_watcher.json` definition
-would look like this:
+A future opt-in `monitors/flutter_run_watcher.json` definition could look like this:
 
 ```json
 {
@@ -138,9 +140,8 @@ would look like this:
 }
 ```
 
-This format is speculative — it is documented here so that when the Claude Code platform
-adds monitor support, FlutterForge can ship working definitions without redesigning the
-concept from scratch.
+Do not enable a monitor like this globally. It should be copied into a Flutter project
+only when the team wants continuous runtime observation for a specific investigation.
 
 ---
 

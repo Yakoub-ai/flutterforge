@@ -27,6 +27,9 @@ jobs:
       - name: Validate hooks.json
         run: python3 -m json.tool hooks/hooks.json > /dev/null
 
+      - name: Validate .lsp.json
+        run: python3 -m json.tool .lsp.json > /dev/null
+
       - name: Validate marketplace.json
         run: python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
 
@@ -35,7 +38,7 @@ jobs:
       - name: Check shell script syntax
         run: |
           failed=0
-          for f in hooks/lib/*.sh scripts/*.sh; do
+          for f in skills.sh hooks/lib/*.sh scripts/*.sh; do
             [ -f "$f" ] || continue
             if ! bash -n "$f"; then
               echo "FAIL: $f has syntax errors"
@@ -109,8 +112,8 @@ jobs:
             const plugin = m.plugins[0];
             if (!plugin) { console.error('FAIL: marketplace.json has no plugins[]'); process.exit(1); }
             if (plugin.name !== p.name) { console.error('FAIL: name mismatch: marketplace=' + plugin.name + ' plugin=' + p.name); process.exit(1); }
-            if (plugin.version !== p.version) { console.error('FAIL: version mismatch: marketplace=' + plugin.version + ' plugin=' + p.version); process.exit(1); }
-            if (m.metadata && m.metadata.version && m.metadata.version !== p.version) { console.error('FAIL: metadata.version mismatch: marketplace=' + m.metadata.version + ' plugin=' + p.version); process.exit(1); }
+            if (plugin.version) { console.error('FAIL: marketplace plugin entry must not set version; plugin.json is the source of truth'); process.exit(1); }
+            if (m.metadata && m.metadata.version) { console.error('FAIL: marketplace metadata.version must not be set; plugin.json is the source of truth'); process.exit(1); }
             const source = plugin.source.replace(/\\/+$/, '');
             if (!fs.existsSync(source + '/.claude-plugin/plugin.json')) { console.error('FAIL: plugins[0].source does not resolve to a directory with .claude-plugin/plugin.json'); process.exit(1); }
             console.log('OK: marketplace.json is consistent with plugin.json');
@@ -144,7 +147,7 @@ jobs:
         run: |
           result=$(echo '{"tool_name":"Write","tool_input":{"file_path":"config.dart","content":"final apiKey = \"AIzaFakeKey1234567890abcdefghijklmnopqr\";"}}' | node hooks/lib-node/secret_detect.cjs; echo "exit:$?")
           echo "$result"
-          if echo "$result" | grep -q '"decision":"block"'; then
+          if echo "$result" | grep -q '"permissionDecision":"deny"'; then
             echo "OK: secret_detect correctly blocks Google API key"
           else
             echo "FAIL: secret_detect did not block a Google API key"
@@ -155,7 +158,27 @@ jobs:
         run: |
           result=$(echo '{"tool_name":"Write","tool_input":{"file_path":"config.dart","content":"final apiKey = \"YOUR_API_KEY_HERE\";"}}' | node hooks/lib-node/secret_detect.cjs; echo "exit:$?")
           echo "$result"
-          echo "$result" | grep -q '"decision":"block"' && { echo "FAIL: secret_detect blocked a placeholder value"; exit 1; } || echo "OK: secret_detect allows placeholder"
+          echo "$result" | grep -q '"permissionDecision":"deny"' && { echo "FAIL: secret_detect blocked a placeholder value"; exit 1; } || echo "OK: secret_detect allows placeholder"
+
+      - name: Hook smoke test — secret_detect blocks .env edits
+        run: |
+          result=$(echo '{"tool_name":"Edit","tool_input":{"file_path":".env","new_string":"APP_ENV=development"}}' | node hooks/lib-node/secret_detect.cjs; echo "exit:$?")
+          echo "$result"
+          if echo "$result" | grep -q '"permissionDecision":"deny"'; then
+            echo "OK: secret_detect blocks bare .env edits"
+          else
+            echo "FAIL: secret_detect did not block a bare .env edit"
+            exit 1
+          fi
+
+      - name: skills.sh smoke test
+        run: |
+          bash skills.sh list | grep -q "flutter-architecture"
+          tmp="$(mktemp -d)"
+          bash skills.sh install --skills-dir "$tmp/skills" --agents-dir "$tmp/agents"
+          test -f "$tmp/skills/flutter-architecture/SKILL.md"
+          test -f "$tmp/agents/flutter-architect.md"
+          echo "OK: skills.sh installs skills and agents"
 
       - name: Hook smoke test — post_edit_format exits 0 for non-dart file
         run: |
@@ -170,7 +193,7 @@ jobs:
       - name: ShellCheck — scripts/
         run: |
           failed=0
-          for f in scripts/*.sh; do
+          for f in skills.sh scripts/*.sh; do
             [ -f "$f" ] || continue
             if shellcheck "$f"; then
               echo "OK: $f"

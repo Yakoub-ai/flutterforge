@@ -161,7 +161,7 @@ Goal: Release readiness check
 
 [YOUR TASK]:
 1. Read pubspec.yaml. Check: version field format is `x.y.z+build` (e.g. `1.0.0+1`), name does not contain `example` or `template`.
-2. Read `android/app/build.gradle` or `android/app/build.gradle.kts` if present. Check: `applicationId` is not `com.example.*`, minSdkVersion is set, targetSdkVersion is recent (31+).
+2. Read `android/app/build.gradle` or `android/app/build.gradle.kts` if present. Check: `applicationId` is not `com.example.*`, minSdkVersion is set, targetSdkVersion/targetSdk meets current Google Play policy. As of 2026-05-14, new apps and updates must target Android 15 / API level 35 or higher unless an exception applies.
 3. Read `ios/Runner/Info.plist` if present. Check: `CFBundleIdentifier` is not `com.example.*`, `CFBundleDisplayName` is set.
 4. Check for app icons: `android/app/src/main/res/mipmap-*/ic_launcher.png` (should exist in multiple densities), `ios/Runner/Assets.xcassets/AppIcon.appiconset/` (should have Contents.json).
 5. Grep for `com.example` in all Gradle and plist files.

@@ -5,7 +5,7 @@
 // Opt-in: only runs when FLUTTERFORGE_AUTO_ANALYZE=1.
 
 const path = require('path');
-const { readStdin, findFlutterProjectRoot, runCmd } = require('./_common.cjs');
+const { readStdin, findFlutterProjectRoot, runCmd, resolveToolPath } = require('./_common.cjs');
 
 // Guard: only run if explicitly enabled
 if (process.env.FLUTTERFORGE_AUTO_ANALYZE !== '1') process.exit(0);
@@ -15,7 +15,8 @@ const filePath = (input.tool_input && input.tool_input.file_path) || '';
 
 if (!filePath.endsWith('.dart')) process.exit(0);
 
-const root = findFlutterProjectRoot(path.dirname(path.resolve(filePath)));
+const resolvedFilePath = resolveToolPath(filePath, input.cwd);
+const root = findFlutterProjectRoot(path.dirname(resolvedFilePath) || input.cwd);
 if (!root) process.exit(0);
 
 process.stdout.write('FlutterForge [post_edit_analyze]: Running flutter analyze...\n');
