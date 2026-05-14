@@ -39,15 +39,20 @@ EOF
 expand_path() {
   local value="$1"
   case "$value" in
-    "~") printf '%s\n' "$HOME" ;;
-    "~/"*) printf '%s/%s\n' "$HOME" "${value#~/}" ;;
+    \~) printf '%s\n' "$HOME" ;;
+    \~/*) printf '%s/%s\n' "$HOME" "${value#~/}" ;;
     *) printf '%s\n' "$value" ;;
   esac
 }
 
 repo_root_from_script() {
   local script_dir
-  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || pwd)"
+  if script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd)"; then
+    :
+  else
+    script_dir="$(pwd)"
+  fi
+
   if [[ -d "$script_dir/skills" && -d "$script_dir/agents" ]]; then
     printf '%s\n' "$script_dir"
     return 0
