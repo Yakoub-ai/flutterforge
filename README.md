@@ -40,25 +40,29 @@ Optional (required only for the corresponding MCP integration):
 
 ## Install
 
-FlutterForge is **not** a global install. Clone the repo once and launch Claude Code with the plugin directory pointed at the clone — per project, on demand.
+### Option A — Install via Claude Code marketplace (recommended)
 
-### 1. Clone the repo
+Inside any Claude Code session:
+
+```bash
+/plugin marketplace add Yakoub-ai/flutterforge
+/plugin install flutterforge@flutterforge
+```
+
+Once installed, start FlutterForge with:
+
+```bash
+claude
+```
+
+### Option B — Local clone (for contributors or offline use)
+
+Clone the repo once and launch Claude Code with the plugin directory pointed at the clone:
 
 ```bash
 git clone https://github.com/Yakoub-ai/flutterforge.git
-```
-
-You can clone it anywhere — into your Flutter project, into `~/flutterforge`, or alongside other tools. The path doesn't matter; you'll point Claude at it in the next step.
-
-### 2. Launch Claude Code with the plugin
-
-From the directory that contains the `flutterforge/` clone, run:
-
-```bash
 claude --plugin-dir ./flutterforge
 ```
-
-That session will have all FlutterForge commands, agents, skills, hooks, and MCP servers loaded. Quit and relaunch without `--plugin-dir` to use Claude without the plugin.
 
 > **Tip:** If you work in the same Flutter project most days, add a shell alias:
 > ```bash
