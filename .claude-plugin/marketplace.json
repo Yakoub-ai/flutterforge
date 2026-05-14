@@ -1,0 +1,32 @@
+{
+  "name": "flutterforge",
+  "owner": {
+    "name": "George Yakoub",
+    "url": "https://github.com/Yakoub-ai"
+  },
+  "metadata": {
+    "description": "FlutterForge marketplace — end-to-end Flutter mobile development workflows for Claude Code.",
+    "version": "0.3.0"
+  },
+  "plugins": [
+    {
+      "name": "flutterforge",
+      "source": "./",
+      "description": "End-to-end Flutter mobile application development workflow plugin for Claude Code. Guides teams from idea to release-ready app with specialized agents, skills, hooks, and subagent-driven workflows.",
+      "version": "0.3.0",
+      "author": {
+        "name": "George Yakoub",
+        "url": "https://github.com/Yakoub-ai"
+      },
+      "homepage": "https://github.com/Yakoub-ai/flutterforge#readme",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "flutter", "dart", "mobile", "android", "ios",
+        "firebase", "supabase", "riverpod", "bloc",
+        "clean-architecture", "ux", "testing", "debugging",
+        "release", "workflow"
+      ]
+    }
+  ]
+}
