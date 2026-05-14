@@ -53,6 +53,5 @@
     "./agents/release-engineer.md",
     "./agents/codebase-auditor.md"
   ],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json"
 }

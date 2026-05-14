@@ -40,30 +40,37 @@ Optional (required only for the corresponding MCP integration):
 
 ## Install
 
-### Option 1: Local install from clone
+FlutterForge is **not** a global install. Clone the repo once and launch Claude Code with the plugin directory pointed at the clone — per project, on demand.
+
+### 1. Clone the repo
 
 ```bash
-git clone https://github.com/Yakoub-ai/flutterforge.git ~/flutterforge
+git clone https://github.com/Yakoub-ai/flutterforge.git
 ```
 
-Then in Claude Code, run:
+You can clone it anywhere — into your Flutter project, into `~/flutterforge`, or alongside other tools. The path doesn't matter; you'll point Claude at it in the next step.
 
-```
-/plugin install --from-dir ~/flutterforge
+### 2. Launch Claude Code with the plugin
+
+From the directory that contains the `flutterforge/` clone, run:
+
+```bash
+claude --plugin-dir ./flutterforge
 ```
 
-### Option 2: Marketplace
+That session will have all FlutterForge commands, agents, skills, hooks, and MCP servers loaded. Quit and relaunch without `--plugin-dir` to use Claude without the plugin.
 
-```
-/plugin marketplace add https://github.com/Yakoub-ai/flutterforge
-/plugin install flutterforge
-```
+> **Tip:** If you work in the same Flutter project most days, add a shell alias:
+> ```bash
+> alias flutterforge='claude --plugin-dir /absolute/path/to/flutterforge'
+> ```
+> Then just type `flutterforge` to start a Claude session with the plugin loaded.
 
 ### Verify installation
 
-After install, run `/flutterforge:flutterforge` in Claude Code — you should see the FlutterForge workflow menu.
+Inside the launched Claude Code session, run `/flutterforge:flutterforge` — you should see the FlutterForge workflow menu.
 
-If hooks do not fire, ensure Node.js is on your PATH: `node --version` should print `v18` or later.
+If hooks do not fire, ensure Node.js is on your PATH (`node --version` should print `v18` or later) and that you launched Claude from a shell where `node` resolves.
 
 ---
 
