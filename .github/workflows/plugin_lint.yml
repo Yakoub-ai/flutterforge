@@ -110,6 +110,7 @@ jobs:
             if (!plugin) { console.error('FAIL: marketplace.json has no plugins[]'); process.exit(1); }
             if (plugin.name !== p.name) { console.error('FAIL: name mismatch: marketplace=' + plugin.name + ' plugin=' + p.name); process.exit(1); }
             if (plugin.version !== p.version) { console.error('FAIL: version mismatch: marketplace=' + plugin.version + ' plugin=' + p.version); process.exit(1); }
+            if (m.metadata && m.metadata.version && m.metadata.version !== p.version) { console.error('FAIL: metadata.version mismatch: marketplace=' + m.metadata.version + ' plugin=' + p.version); process.exit(1); }
             const source = plugin.source.replace(/\\/+$/, '');
             if (!fs.existsSync(source + '/.claude-plugin/plugin.json')) { console.error('FAIL: plugins[0].source does not resolve to a directory with .claude-plugin/plugin.json'); process.exit(1); }
             console.log('OK: marketplace.json is consistent with plugin.json');
