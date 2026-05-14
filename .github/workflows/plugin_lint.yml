@@ -38,7 +38,7 @@ jobs:
       - name: Check shell script syntax
         run: |
           failed=0
-          for f in skills.sh hooks/lib/*.sh scripts/*.sh; do
+          for f in hooks/lib/*.sh scripts/*.sh; do
             [ -f "$f" ] || continue
             if ! bash -n "$f"; then
               echo "FAIL: $f has syntax errors"
@@ -119,6 +119,11 @@ jobs:
             console.log('OK: marketplace.json is consistent with plugin.json');
           "
 
+      - name: skills.sh discovery smoke test
+        run: |
+          npx -y skills add . --list | grep -q "flutter-architecture"
+          echo "OK: skills CLI discovers FlutterForge skills"
+
       - name: Node.js syntax check — hook scripts
         run: |
           failed=0
@@ -171,15 +176,6 @@ jobs:
             exit 1
           fi
 
-      - name: skills.sh smoke test
-        run: |
-          bash skills.sh list | grep -q "flutter-architecture"
-          tmp="$(mktemp -d)"
-          bash skills.sh install --skills-dir "$tmp/skills" --agents-dir "$tmp/agents"
-          test -f "$tmp/skills/flutter-architecture/SKILL.md"
-          test -f "$tmp/agents/flutter-architect.md"
-          echo "OK: skills.sh installs skills and agents"
-
       - name: Hook smoke test — post_edit_format exits 0 for non-dart file
         run: |
           echo '{"tool_name":"Write","tool_input":{"file_path":"README.md","content":"# test"}}' | node hooks/lib-node/post_edit_format.cjs
@@ -193,7 +189,7 @@ jobs:
       - name: ShellCheck — scripts/
         run: |
           failed=0
-          for f in skills.sh scripts/*.sh; do
+          for f in scripts/*.sh; do
             [ -f "$f" ] || continue
             if shellcheck "$f"; then
               echo "OK: $f"

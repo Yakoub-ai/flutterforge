@@ -13,10 +13,12 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `.claude-plugin/marketplace.json` — marketplace catalog manifest enabling installation via `/plugin marketplace add Yakoub-ai/flutterforge` + `/plugin install flutterforge@flutterforge`.
 - CI validation in `plugin_lint.yml`: new steps assert `marketplace.json` exists, parses as JSON, and matches `plugin.json` on `name`, `version`, and `source` path — prevents silent regression.
+- skills.sh compatibility docs and CI validation via `npx skills add . --list`, so FlutterForge skills are discoverable by the open `skills` CLI for Claude Code, Codex, Cursor, and other supported agents.
 
 ### Changed
 
 - README `## Install` section restructured: marketplace install is now **Option A** (recommended); local clone via `--plugin-dir` is **Option B** (contributors / offline).
+- Removed the repo-local `skills.sh` installer in favor of the official `npx skills add Yakoub-ai/flutterforge` workflow.
 
 ### Fixed
 
