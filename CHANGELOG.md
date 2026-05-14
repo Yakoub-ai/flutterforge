@@ -9,6 +9,15 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `.claude-plugin/marketplace.json` — marketplace catalog manifest enabling installation via `/plugin marketplace add Yakoub-ai/flutterforge` + `/plugin install flutterforge@flutterforge`.
+- CI validation in `plugin_lint.yml`: new steps assert `marketplace.json` exists, parses as JSON, and matches `plugin.json` on `name`, `version`, and `source` path — prevents silent regression.
+
+### Changed
+
+- README `## Install` section restructured: marketplace install is now **Option A** (recommended); local clone via `--plugin-dir` is **Option B** (contributors / offline).
+
 ### Fixed
 
 - Claude Code plugin validation now passes after quoting command argument hints that contain YAML-sensitive characters.
